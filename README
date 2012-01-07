@@ -1,0 +1,3 @@
+Brainf*** interpreter written in C++ using LLVM.
+
+This is just a play project for me to learn a little bit about LLVM. Don't actually use this. I don't know why you'd ever consider using Brainf*** anyway.
