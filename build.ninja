@@ -1,0 +1,18 @@
+
+builddir = build
+rule cxx
+    command = clang++ -std=c++11 -MMD -MF $out.d -Wall -Werror $in -c -o $out
+    description = cxx $in
+    depfile = $out.d
+
+rule link
+    command = clang++ $in -o $out
+    description = link $out
+
+build $builddir/parse.o: cxx parse.cc
+build $builddir/ast.o: cxx ast.cc
+build $builddir/reader.o: cxx reader.cc
+build $builddir/main.o: cxx main.cc
+build brainf: link $builddir/main.o $builddir/parse.o $
+      $builddir/ast.o $builddir/reader.o
+default brainf
