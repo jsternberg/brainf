@@ -12,7 +12,7 @@ rule link
 build $builddir/parse.o: cxx parse.cc
 build $builddir/ast.o: cxx ast.cc
 build $builddir/reader.o: cxx reader.cc
-build $builddir/main.o: cxx main.cc
-build brainf: link $builddir/main.o $builddir/parse.o $
+build $builddir/brainf.o: cxx brainf.cc
+build brainf: link $builddir/brainf.o $builddir/parse.o $
       $builddir/ast.o $builddir/reader.o
 default brainf
