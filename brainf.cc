@@ -33,16 +33,15 @@ int main(int argc, char *argv[]) {
   llvm::Function *memset = static_cast<llvm::Function*>(module.getOrInsertFunction("memset", llvm::Type::getInt8PtrTy(ctx), llvm::Type::getInt8PtrTy(ctx), llvm::Type::getInt32Ty(ctx), llvm::Type::getInt64Ty(ctx), NULL));
   llvm::Function *main = static_cast<llvm::Function*>(module.getOrInsertFunction("main", llvm::Type::getInt32Ty(ctx), NULL));
   llvm::IRBuilder<> builder(llvm::BasicBlock::Create(ctx, "entry", main));
-  llvm::AllocaInst *tape = builder.CreateAlloca(llvm::ArrayType::get(llvm::Type::getInt32Ty(ctx), 1000), 0, "tape");
-  llvm::AllocaInst *p = builder.CreateAlloca(llvm::Type::getInt32PtrTy(ctx), 0, "p");
+  llvm::AllocaInst *tape = builder.CreateAlloca(llvm::ArrayType::get(llvm::Type::getInt8Ty(ctx), 30000), 0, "tape");
+  llvm::AllocaInst *p = builder.CreateAlloca(llvm::Type::getInt8PtrTy(ctx), 0, "p");
 
   {
     std::vector<llvm::Value*> args;
     args.push_back(builder.getInt32(0));
     args.push_back(builder.getInt32(0));
     llvm::Value *t = builder.CreateInBoundsGEP(tape, args);
-    llvm::Value *c = builder.CreateBitCast(t, llvm::Type::getInt8PtrTy(ctx));
-    builder.CreateCall3(memset, c, builder.getInt32(0), builder.getInt64(4000));
+    builder.CreateCall3(memset, t, builder.getInt32(0), builder.getInt64(30000));
     builder.CreateStore(t, p);
   }
 

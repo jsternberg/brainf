@@ -22,7 +22,7 @@ void OperationAST::Codegen(llvm::IRBuilder<>& builder, llvm::Module&) {
 
   Value *ptr = builder.CreateLoad(p);
   Value *var = builder.CreateLoad(ptr);
-  Value *next = builder.CreateAdd(var, builder.getInt32(increment_ ? 1 : -1));
+  Value *next = builder.CreateAdd(var, builder.getInt8(increment_ ? 1 : -1));
   builder.CreateStore(next, ptr);
 }
 
@@ -32,7 +32,7 @@ void ShiftAST::Codegen(llvm::IRBuilder<>& builder, llvm::Module&) {
   AllocaInst *p = static_cast<AllocaInst*>(symTable->lookup("p"));
 
   Value *ptr = builder.CreateLoad(p);
-  Value *off = builder.CreateGEP(ptr, builder.getInt32(right_ ? 1 : -1));
+  Value *off = builder.CreateGEP(ptr, builder.getInt8(right_ ? 1 : -1));
   builder.CreateStore(off, p);
 }
 
@@ -53,7 +53,7 @@ void WhileAST::Codegen(llvm::IRBuilder<>& builder, llvm::Module& module) {
 
   builder.SetInsertPoint(cmp);
   Value *var = builder.CreateLoad(builder.CreateLoad(p));
-  Value *cond = builder.CreateICmpNE(var, builder.getInt32(0));
+  Value *cond = builder.CreateICmpNE(var, builder.getInt8(0));
   builder.CreateCondBr(cond, start, end);
 
   f->getBasicBlockList().push_back(start);
@@ -78,7 +78,7 @@ void PrintAST::Codegen(llvm::IRBuilder<>& builder, llvm::Module& module) {
   Function *f = static_cast<Function*>(module.getOrInsertFunction("putchar", Type::getInt32Ty(ctx), Type::getInt32Ty(ctx), NULL));
 
   Value *var = builder.CreateLoad(builder.CreateLoad(p));
-  builder.CreateCall(f, var);
+  builder.CreateCall(f, builder.CreateSExt(var, Type::getInt32Ty(ctx)));
 }
 
 void GetAST::Codegen(llvm::IRBuilder<>& builder, llvm::Module& module) {
@@ -90,6 +90,6 @@ void GetAST::Codegen(llvm::IRBuilder<>& builder, llvm::Module& module) {
   LLVMContext& ctx = block->getContext();
   Function *f = static_cast<Function*>(module.getOrInsertFunction("getchar", Type::getInt32Ty(ctx), NULL));
 
-  Value *var = builder.CreateCall(f);
+  Value *var = builder.CreateTrunc(builder.CreateCall(f), Type::getInt8Ty(ctx));
   builder.CreateStore(var, builder.CreateLoad(p));
 }
