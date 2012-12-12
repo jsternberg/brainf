@@ -5,4 +5,4 @@
 #include "ast.h"
 using namespace std;
 
-unique_ptr<AST> Parse(const string& inp);
+unique_ptr<ExprAST> Parse(const string& inp);

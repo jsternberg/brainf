@@ -1,12 +1,15 @@
 
 builddir = build
+cflags = -I/usr/lib/llvm-3.1/include  -DNDEBUG -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -g -O2 -fomit-frame-pointer -fPIC
+ldflags = -L/usr/lib/llvm-3.1/lib -lLLVMCore -lLLVMSupport -lpthread -ldl
+
 rule cxx
-    command = clang++ -std=c++11 -MMD -MF $out.d -Wall -Werror $in -c -o $out
+    command = clang++ -std=c++11 -MMD -MF $out.d -Wall -Werror $cflags $in -c -o $out
     description = cxx $in
     depfile = $out.d
 
 rule link
-    command = clang++ $in -o $out
+    command = clang++ $in $ldflags -o $out
     description = link $out
 
 build $builddir/parse.o: cxx parse.cc

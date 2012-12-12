@@ -2,7 +2,7 @@
 #include <vector>
 #include "parse.h"
 
-unique_ptr<AST> Parse(const string& inp) {
+unique_ptr<ExprAST> Parse(const string& inp) {
   vector<BodyAST*> stack;
   auto *ast = new BodyAST;
   for (char ch : inp) {
@@ -13,17 +13,11 @@ unique_ptr<AST> Parse(const string& inp) {
       case '-':
         ast->append(new OperationAST(false));
         break;
-      case '<':
-        ast->append(new ShiftAST(false));
-        break;
-      case '>':
-        ast->append(new ShiftAST(true));
-        break;
+      case '<': break;
+      case '>': break;
       case '[':
-        // todo: this should be a WhileAST which should inherit from
-        // BodyAST
         stack.push_back(ast);
-        ast = new BodyAST;
+        ast = new WhileAST;
         break;
       case ']':
         if (stack.empty()) // error, for now just discard the input
@@ -32,8 +26,12 @@ unique_ptr<AST> Parse(const string& inp) {
         ast = stack.back();
         stack.pop_back();
         break;
-      case '.': break;
-      case ',': break;
+      case '.':
+        ast->append(new PrintAST);
+        break;
+      case ',':
+        ast->append(new GetAST);
+        break;
       default: break; // ignore invalid characters
     }
   }
@@ -44,5 +42,5 @@ unique_ptr<AST> Parse(const string& inp) {
     ast = stack.back();
     stack.pop_back();
   }
-  return unique_ptr<AST>(ast);
+  return unique_ptr<ExprAST>(ast);
 }
