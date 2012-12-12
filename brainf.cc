@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
   }
 
   ast->Codegen(builder, module);
-  builder.CreateRet(llvm::ConstantInt::getSigned(llvm::Type::getInt32Ty(ctx), 0));
+  builder.CreateRet(builder.getInt32(0));
 
   llvm::raw_fd_ostream fd(fileno(stdout), false);
   module.print(fd, NULL);
