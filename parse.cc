@@ -13,8 +13,12 @@ unique_ptr<ExprAST> Parse(const string& inp) {
       case '-':
         ast->append(new OperationAST(false));
         break;
-      case '<': break;
-      case '>': break;
+      case '<':
+        ast->append(new ShiftAST(false));
+        break;
+      case '>':
+        ast->append(new ShiftAST(true));
+        break;
       case '[':
         stack.push_back(ast);
         ast = new WhileAST;

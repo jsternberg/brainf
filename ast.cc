@@ -20,9 +20,20 @@ void OperationAST::Codegen(llvm::IRBuilder<>& builder, llvm::Module&) {
   ValueSymbolTable *symTable = builder.GetInsertBlock()->getValueSymbolTable();
   AllocaInst *p = static_cast<AllocaInst*>(symTable->lookup("p"));
 
-  Value *var = builder.CreateLoad(p);
+  Value *ptr = builder.CreateLoad(p);
+  Value *var = builder.CreateLoad(ptr);
   Value *next = builder.CreateAdd(var, builder.getInt32(increment_ ? 1 : -1));
-  builder.CreateStore(next, p);
+  builder.CreateStore(next, ptr);
+}
+
+void ShiftAST::Codegen(llvm::IRBuilder<>& builder, llvm::Module&) {
+  using namespace llvm;
+  ValueSymbolTable *symTable = builder.GetInsertBlock()->getValueSymbolTable();
+  AllocaInst *p = static_cast<AllocaInst*>(symTable->lookup("p"));
+
+  Value *ptr = builder.CreateLoad(p);
+  Value *off = builder.CreateGEP(ptr, builder.getInt32(right_ ? 1 : -1));
+  builder.CreateStore(off, p);
 }
 
 void WhileAST::Codegen(llvm::IRBuilder<>& builder, llvm::Module& module) {
@@ -41,7 +52,7 @@ void WhileAST::Codegen(llvm::IRBuilder<>& builder, llvm::Module& module) {
   f->getBasicBlockList().push_back(cmp);
 
   builder.SetInsertPoint(cmp);
-  Value *var = builder.CreateLoad(p);
+  Value *var = builder.CreateLoad(builder.CreateLoad(p));
   Value *cond = builder.CreateICmpNE(var, builder.getInt32(0));
   builder.CreateCondBr(cond, start, end);
 
@@ -66,7 +77,7 @@ void PrintAST::Codegen(llvm::IRBuilder<>& builder, llvm::Module& module) {
   LLVMContext& ctx = block->getContext();
   Function *f = static_cast<Function*>(module.getOrInsertFunction("putchar", Type::getInt32Ty(ctx), Type::getInt32Ty(ctx), NULL));
 
-  Value *var = builder.CreateLoad(p);
+  Value *var = builder.CreateLoad(builder.CreateLoad(p));
   builder.CreateCall(f, var);
 }
 
@@ -80,5 +91,5 @@ void GetAST::Codegen(llvm::IRBuilder<>& builder, llvm::Module& module) {
   Function *f = static_cast<Function*>(module.getOrInsertFunction("getchar", Type::getInt32Ty(ctx), NULL));
 
   Value *var = builder.CreateCall(f);
-  builder.CreateStore(var, p);
+  builder.CreateStore(var, builder.CreateLoad(p));
 }

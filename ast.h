@@ -22,6 +22,12 @@ struct OperationAST : ExprAST {
   virtual void Codegen(llvm::IRBuilder<>& builder, llvm::Module&);
 };
 
+struct ShiftAST : ExprAST {
+  bool right_;
+  ShiftAST(bool right) : right_(right) {}
+  virtual void Codegen(llvm::IRBuilder<>& builder, llvm::Module&);
+};
+
 struct WhileAST : BodyAST {
   virtual void Codegen(llvm::IRBuilder<>& builder, llvm::Module&);
 };
